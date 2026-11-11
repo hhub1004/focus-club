@@ -27,7 +27,7 @@
   --bg:#15131c; --paper:#1e1b28; --ink:#ece9f5; --muted:#a49eb8; --line:#2f2b3d;
   --accent:#a48dff; --accent-soft:#2c2545; --mark:#5a4d12; --on-accent:#15131c; color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.65;
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.65;word-break:keep-all;overflow-wrap:break-word;line-break:strict;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
 .wrap{max-width:640px;margin:0 auto}
 header{padding-block:32px 8px}
@@ -66,7 +66,7 @@ textarea{min-height:160px;resize:vertical}
 .thief p{margin:0;font-size:14.5px}
 .thief .tip{margin-top:6px;font-family:var(--hand);font-size:15px}
 .thief .tip b{background:linear-gradient(transparent 55%,var(--mark) 55%);font-weight:400}
-.line-out{font:600 14px/1.5 var(--body);background:var(--bg);border:1px dashed var(--accent);border-radius:10px;padding:12px;word-break:keep-all;overflow-wrap:anywhere;margin-top:16px}
+.line-out{font:600 14px/1.5 var(--body);background:var(--bg);border:1px dashed var(--accent);border-radius:10px;padding:12px;word-break:keep-all;overflow-wrap:break-word;margin-top:16px}
 .axis{padding-block:14px;border-bottom:1px solid var(--line)}
 .axis-head{display:flex;justify-content:space-between;gap:8px;font-size:14px;color:var(--muted);margin-bottom:8px}
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -136,7 +136,7 @@ textarea{min-height:160px;resize:vertical}
 #p-slide .split strong{font-size:clamp(24px,3vw,32px)}
 #p-slide .result > .hint, #p-slide .result > .bars:last-child{display:none}
 .p-label{font-size:15px;color:var(--accent);font-weight:700;letter-spacing:.06em;margin:0 0 14px}
-.p-q{font-family:var(--display);font-weight:400;font-size:clamp(30px,5.2vw,58px);line-height:1.25;margin:0;text-wrap:balance}
+.p-q{word-break:keep-all;font-family:var(--display);font-weight:400;font-size:clamp(30px,5.2vw,58px);line-height:1.25;margin:0;text-wrap:balance}
 .p-nav{display:flex;justify-content:space-between;gap:12px}
 footer{margin-top:36px;font-size:12.5px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
