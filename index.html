@@ -112,6 +112,10 @@ textarea{min-height:160px;resize:vertical}
 .big-card .parch b{font-family:var(--display);font-weight:400;font-size:clamp(14px,4.4vw,21px)}
 .big-card .parch-name{font-size:clamp(13px,3.8vw,18px);font-weight:700}
 .big-card .parch small{font-size:clamp(9px,2.6vw,12px)}
+.big-card .ati-type{font-family:var(--display);font-size:24px;line-height:1.25;margin-top:2px}
+.big-card .ati-strength{margin:2px 0 0;font-family:var(--hand);font-size:16.5px;background:linear-gradient(transparent 60%,var(--mark) 60%);padding:0 4px}
+.big-card .ati-poles{margin-top:8px;font-size:13.5px;color:var(--muted)}
+.big-card .ati-src{margin-top:2px;font-size:11.5px;color:var(--muted);opacity:.8}
 .nick{text-align:center;margin:4px 0 16px}
 .nick small{display:block;font-size:12.5px;letter-spacing:.1em;color:var(--muted)}
 .nick strong{display:inline-block;margin-top:4px;font-family:var(--display);font-weight:400;font-size:clamp(24px,7vw,32px);line-height:1.25;background:linear-gradient(transparent 58%,var(--mark) 58%);padding:0 6px}
@@ -295,10 +299,13 @@ footer{margin-top:36px;font-size:12.5px;color:var(--muted)}
   ];
   const AXES = [
     {k:"대상", a:["G","팔방미인파"], b:["S","한우물파"]},
-    {k:"시간", a:["B","돛단배형"], b:["T","모터보트형"]},
-    {k:"패턴", a:["F",""], b:["C",""]},
-    {k:"동기", a:["M",""], b:["U",""]}
+    {k:"시간", a:["B","돛단배파"], b:["T","모터보트파"]},
+    {k:"패턴", a:["F","팩트파"], b:["C","맥락파"]},
+    {k:"동기", a:["M","내별파"], b:["U","우리별파"]}
   ];
+  // 16유형 이름·한 줄 강점 — ATI 검사 사이트(ati-book-v2.vercel.app)의 조합표 그대로
+  const ATI_TYPES = {"GTFM": {"type": "박학 장인형", "strength": "넓은 지식을 오래 깊이 파고드는 실력자"}, "GTFU": {"type": "체계적 수호자형", "strength": "안정적 협업과 신뢰받는 전문성"}, "GTCM": {"type": "통찰 탐험가형", "strength": "독창적 세계관과 깊은 통찰"}, "GTCU": {"type": "비전 설계자형", "strength": "장기 전략과 설득력 있는 방향 제시"}, "GBFM": {"type": "민첩한 분석가형", "strength": "빠른 데이터 수집과 판단"}, "GBFU": {"type": "현장 해결사형", "strength": "위기 대응, 팀을 위한 빠른 실행"}, "GBCM": {"type": "네트워크 기획자형", "strength": "융합적 사고와 빠른 아이디어 연결"}, "GBCU": {"type": "촉매형 리더", "strength": "설득력과 상황 적응형 리더십"}, "STFM": {"type": "장인 전문가형", "strength": "특정 분야의 독보적 깊이"}, "STFU": {"type": "헌신적 전문가형", "strength": "조직을 위한 깊은 전문 기여"}, "STCM": {"type": "독자적 창조자형", "strength": "깊고 독창적인 창작 세계"}, "STCU": {"type": "사상적 리더형", "strength": "깊은 통찰로 방향을 제시하는 힘"}, "SBFM": {"type": "기민한 탐색자형", "strength": "빠른 정보 탐색과 유연한 적응"}, "SBFU": {"type": "기민한 실행자형", "strength": "팀을 위한 빠른 실행과 적응"}, "SBCM": {"type": "창업가형", "strength": "기회 포착과 빠른 실험"}, "SBCU": {"type": "변혁적 리더형", "strength": "변화 주도와 팀 동기부여"}};
+  function poleNames(code){ return code.split("").map((L,i)=>{ const a=AXES[i]; return (a.a[0]===L?a.a:a.b)[1]; }); }
   const LABELS = ["전혀","아니다","보통","그렇다","매우"];
   // 오늘의 별명: 2위 도둑의 수식어 + 1위 도둑의 명사 (재미용)
   const NICK_NOUN = ["탭 100개 장인","몰입 실종 신고자","새벽 3시 스크롤러","세 줄 요약 마니아","엘리베이터 폰 꺼내기 장인","알림 수집가","셀프 반성문 작가","걱정 인형 수집가","편의점 미식가","창문 닫힌 방 거주자","의자 탈출 전문가","실내 서식 생물"];
@@ -413,9 +420,18 @@ footer{margin-top:36px;font-size:12.5px;color:var(--muted)}
       wrap.querySelector(".parch-name").textContent=nm;
     }
     if(ati.every(Boolean)){
+      const code=ati.join(""), info=ATI_TYPES[code];
       const l=document.createElement("div"); l.className="ati-label"; l.textContent="나의 집중 유형 (ATI)";
-      const a=document.createElement("div"); a.className="ati-big"; a.textContent=ati.join("");
+      const a=document.createElement("div"); a.className="ati-big"; a.textContent=code;
       wrap.append(l,a);
+      if(info){
+        const ty=document.createElement("div"); ty.className="ati-type"; ty.textContent=info.type;
+        const st=document.createElement("p"); st.className="ati-strength"; st.textContent=info.strength;
+        wrap.append(ty,st);
+      }
+      const pn=document.createElement("div"); pn.className="ati-poles"; pn.textContent=poleNames(code).join(" · ");
+      const src=document.createElement("div"); src.className="ati-src"; src.textContent="유형 이름과 설명은 『어텐션』 ATI 검사 사이트 기준";
+      wrap.append(pn,src);
     }
     area.append(wrap);
   }
@@ -520,7 +536,7 @@ footer{margin-top:36px;font-size:12.5px;color:var(--muted)}
       const codes=new Map(); withAti.forEach(r=>codes.set(r.ati,(codes.get(r.ati)||[]).concat(r.name)));
       const bars=document.createElement("div"); bars.className="bars"; bars.style.marginTop="14px";
       [...codes.entries()].sort((a,b)=>b[1].length-a[1].length).forEach(([c,names])=>{
-        const el=bar(c, names.length, withAti.length, "명"); el.title=names.join(", "); bars.append(el);
+        const el=bar(c+(ATI_TYPES[c]?" "+ATI_TYPES[c].type:""), names.length, withAti.length, "명"); el.title=names.join(", "); bars.append(el);
         const nm=document.createElement("div"); nm.className="progress"; nm.style.marginTop="-4px"; nm.textContent=names.join(", "); bars.append(nm);
       });
       box.append(bars);
