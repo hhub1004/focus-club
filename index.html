@@ -37,7 +37,7 @@ h1 mark{background:linear-gradient(transparent 55%,var(--mark) 55%);color:inheri
 .lede{color:var(--muted);margin:0}
 nav{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;display:flex;gap:6px;padding-block:14px;border-bottom:1px solid var(--line);margin-bottom:22px}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
-nav button{flex:1;min-width:0;font:600 14px/1.2 var(--body);padding:11px 6px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+nav button{flex:1;min-width:0;font:600 13.5px/1.2 var(--body);padding:11px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
 nav button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 nav button:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0 0 6px}
@@ -102,6 +102,15 @@ textarea{min-height:160px;resize:vertical}
 .tarot figure{margin:0;position:relative;border-radius:14px;overflow:hidden;box-shadow:0 14px 34px -14px rgba(40,20,90,.55);aspect-ratio:2/3;background:var(--accent-soft)}
 .tarot img{width:100%;height:100%;object-fit:cover;display:block}
 .tarot figcaption{position:absolute;left:14%;right:14%;bottom:7.2%;text-align:center;font-family:var(--display);font-size:clamp(13px,3.4vw,18px);line-height:1.2;color:#3b2a63}
+.big-card{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;margin:6px 0 4px}
+.big-card figure{margin:0;position:relative;width:min(340px,100%);aspect-ratio:2/3;border-radius:18px;overflow:hidden;box-shadow:0 22px 48px -18px rgba(40,20,90,.6);background:var(--accent-soft)}
+.big-card figure img{width:100%;height:100%;object-fit:cover;display:block}
+.big-card figcaption{position:absolute;left:14%;right:14%;bottom:7.2%;font-family:var(--display);font-size:clamp(16px,5vw,24px);line-height:1.2;color:#3b2a63}
+.big-card .t-no{margin-top:14px;font-size:13px;letter-spacing:.14em;color:var(--accent);font-weight:700}
+.big-card .t-desc{margin:0;max-width:30em;font-size:14.5px;color:var(--muted)}
+.big-card .others{margin-top:8px;font-size:14.5px}
+.big-card .ati-big{font-family:var(--display);font-size:34px;letter-spacing:.14em;color:var(--accent);margin-top:4px}
+.big-card .ati-label{font-size:12.5px;color:var(--muted);letter-spacing:.06em;margin-top:10px}
 .board-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,150px);gap:18px;align-items:start;margin-top:10px}
 .board-top .tarot{margin:0;display:block}
 .board-top .tarot figure{width:100%}
@@ -138,7 +147,8 @@ footer{margin-top:36px;font-size:12.5px;color:var(--muted)}
   <nav role="tablist" aria-label="검사 단계">
     <button role="tab" id="tab-thief" aria-controls="view-thief" aria-selected="true" data-view="thief">① 도둑 찾기</button>
     <button role="tab" id="tab-ati" aria-controls="view-ati" aria-selected="false" data-view="ati">② 내 ATI</button>
-    <button role="tab" id="tab-board" aria-controls="view-board" aria-selected="false" data-view="board">③ 모임 결과판</button>
+    <button role="tab" id="tab-card" aria-controls="view-card" aria-selected="false" data-view="card">③ 결과 카드</button>
+    <button role="tab" id="tab-board" aria-controls="view-board" aria-selected="false" data-view="board">④ 결과판</button>
   </nav>
 
   <!-- ① 도둑 찾기 -->
@@ -167,6 +177,16 @@ footer{margin-top:36px;font-size:12.5px;color:var(--muted)}
     <div id="axes"></div>
     <p class="code" id="ati-code" aria-live="polite">· · · ·</p>
     <p class="step-note" id="ati-warn" hidden>네 축을 모두 골라야 공유 한 줄에 ATI가 들어갑니다.</p>
+    <div class="row">
+      <button class="btn" id="go-card" type="button">③ 내 결과 카드 보기</button>
+    </div>
+  </section>
+
+  <!-- ③ 결과 카드 -->
+  <section id="view-card" role="tabpanel" aria-labelledby="tab-card" hidden>
+    <h2>나의 집중력 카드</h2>
+    <p class="hint">내 1번 도둑 카드입니다. 화면을 캡처해 단톡에 함께 올려도 좋아요.</p>
+    <div id="card-area"></div>
     <div class="field">
       <label for="name">이름 (결과판에 표시돼요)</label>
       <input type="text" id="name" maxlength="12" placeholder="예: 홍시" autocomplete="off">
@@ -310,7 +330,6 @@ footer{margin-top:36px;font-size:12.5px;color:var(--muted)}
     const res = box.firstChild;
     res.querySelector("h2").textContent = noThief ? "뚜렷한 도둑이 없어요" : "나를 가장 많이 털어 간 도둑 TOP "+r.length;
     if(noThief){ const p=document.createElement("p"); p.textContent="'그렇다' 이상으로 고른 문항이 없습니다. 지금은 집중력을 비교적 잘 지키고 계신 편입니다."; res.append(p); }
-    else res.append(tarotCard(r[0].t));
     let prevS = null, rankNo = 0;
     r.forEach((x,k)=>{
       if(x.s!==prevS){ rankNo = k+1; prevS = x.s; }
@@ -328,6 +347,36 @@ footer{margin-top:36px;font-size:12.5px;color:var(--muted)}
     if(scroll) res.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth", block:"start"});
   }
   $("see-thief").addEventListener("click",()=>renderThief(true));
+  let lastTop = null;
+  function renderCard(){
+    const area=$("card-area"); area.innerHTML="";
+    const done = answers.every(Boolean);
+    const r = done ? computeTop3() : [];
+    const wrap=document.createElement("div"); wrap.className="big-card";
+    if(!done){
+      wrap.innerHTML='<p class="t-desc">① 도둑 찾기 12문항을 먼저 끝내면 카드가 나옵니다.</p><div class="row"><button class="btn" type="button" id="card-go-thief">① 도둑 찾기로 가기</button></div>';
+      area.append(wrap); $("card-go-thief").addEventListener("click",()=>show("thief")); return;
+    }
+    if(r.length){
+      const t=r[0].t, i=THIEVES.indexOf(t);
+      wrap.innerHTML='<figure><img alt=""><figcaption></figcaption></figure><div class="t-no"></div><p class="t-desc"></p>';
+      const img=wrap.querySelector("img"); img.src="cards/"+(i+1)+".jpg"; img.alt=t.name+" 타로 카드";
+      img.addEventListener("error",()=>img.remove());
+      wrap.querySelector("figcaption").textContent=t.name;
+      wrap.querySelector(".t-no").textContent="나의 1번 도둑 · "+ROMAN[i];
+      wrap.querySelector(".t-desc").textContent=t.d;
+      if(r.length>1){ const o=document.createElement("div"); o.className="others"; o.textContent=r.slice(1).map((x,k)=>(k+2)+"위 "+x.t.name).join(" · "); wrap.append(o); }
+    } else {
+      wrap.innerHTML='<p class="t-desc">뚜렷한 도둑이 없어요. \'그렇다\' 이상으로 고른 문항이 없어서 카드가 나오지 않았습니다. 집중력을 잘 지키고 계신 편입니다.</p>';
+    }
+    if(ati.every(Boolean)){
+      const l=document.createElement("div"); l.className="ati-label"; l.textContent="나의 집중 유형 (ATI)";
+      const a=document.createElement("div"); a.className="ati-big"; a.textContent=ati.join("");
+      wrap.append(l,a);
+    }
+    area.append(wrap);
+  }
+  $("go-card").addEventListener("click",()=>show("card"));
 
   // ATI
   const ax = $("axes");
@@ -481,9 +530,10 @@ footer{margin-top:36px;font-size:12.5px;color:var(--muted)}
   });
 
   // 탭
-  const VIEWS=["thief","ati","board"];
+  const VIEWS=["thief","ati","card","board"];
   function show(v, push){
     if(!VIEWS.includes(v)) v="thief";
+    if(v==="card") renderCard();
     VIEWS.forEach(x=>{ $("view-"+x).hidden = x!==v; $("tab-"+x).setAttribute("aria-selected", x===v?"true":"false"); });
     if(push!==false && location.hash!=="#"+v){ try{ history.replaceState(null,"","#"+v); }catch(e){ location.hash=v; } }
     window.scrollTo(0,0);
