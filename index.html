@@ -108,6 +108,11 @@ textarea{min-height:160px;resize:vertical}
 .big-card figcaption{position:absolute;left:14%;right:14%;bottom:7.2%;font-family:var(--display);font-size:clamp(16px,5vw,24px);line-height:1.2;color:#3b2a63}
 .big-card .t-no{margin-top:14px;font-size:13px;letter-spacing:.14em;color:var(--accent);font-weight:700}
 .big-card .t-desc{margin:0;max-width:30em;font-size:14.5px;color:var(--muted)}
+.big-card .parch{position:absolute;left:46%;width:33%;top:23%;height:21%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#4a3420;font-family:var(--hand);text-align:center;line-height:1.15}
+.big-card .parch b{font-family:var(--display);font-weight:400;font-size:clamp(14px,4.4vw,21px)}
+.big-card .parch-name{font-size:clamp(13px,3.8vw,18px);font-weight:700}
+.big-card .parch small{font-size:clamp(9px,2.6vw,12px)}
+.big-card .cert{margin:6px 0 2px;max-width:24em;font-family:var(--hand);font-size:17px;line-height:1.6;background:linear-gradient(transparent 60%,var(--mark) 60%);padding:0 4px}
 .big-card .others{margin-top:8px;font-size:14.5px}
 .big-card .ati-big{font-family:var(--display);font-size:34px;letter-spacing:.14em;color:var(--accent);margin-top:4px}
 .big-card .ati-label{font-size:12.5px;color:var(--muted);letter-spacing:.06em;margin-top:10px}
@@ -367,7 +372,11 @@ footer{margin-top:36px;font-size:12.5px;color:var(--muted)}
       wrap.querySelector(".t-desc").textContent=t.d;
       if(r.length>1){ const o=document.createElement("div"); o.className="others"; o.textContent=r.slice(1).map((x,k)=>(k+2)+"위 "+x.t.name).join(" · "); wrap.append(o); }
     } else {
-      wrap.innerHTML='<p class="t-desc">뚜렷한 도둑이 없어요. \'그렇다\' 이상으로 고른 문항이 없어서 카드가 나오지 않았습니다. 집중력을 잘 지키고 계신 편입니다.</p>';
+      wrap.innerHTML='<figure><img alt="집중력 지킴이 인증서 카드" src="cards/cert.jpg"><figcaption>집중력 지킴이</figcaption><div class="parch"><b>인증서</b><span class="parch-name"></span><small>건강한 집중력 보유</small></div></figure><div class="t-no">특별 카드 · 인증서</div><p class="cert"></p><p class="t-desc">12가지 도둑 중 \'그렇다\' 이상으로 고른 것이 하나도 없습니다. 하리가 보면 인터뷰를 요청할 수준입니다. 캡처해서 단톡에 자랑해 주세요.</p>';
+      wrap.querySelector("img").addEventListener("error",e=>e.target.remove());
+      const nm=($("name").value.trim()||"이 분");
+      wrap.querySelector(".cert").textContent="위 사람은 도둑맞은 것 없이 집중력을 온전히 지켜 낸 건강한 정신 상태임을 인증합니다.";
+      wrap.querySelector(".parch-name").textContent=nm;
     }
     if(ati.every(Boolean)){
       const l=document.createElement("div"); l.className="ati-label"; l.textContent="나의 집중 유형 (ATI)";
@@ -392,7 +401,7 @@ footer{margin-top:36px;font-size:12.5px;color:var(--muted)}
     });
     ax.append(d);
   });
-  $("name").addEventListener("input",()=>{ updateLine(); store.set("fc-name",$("name").value); });
+  $("name").addEventListener("input",()=>{ updateLine(); store.set("fc-name",$("name").value); const pn=document.querySelector(".parch-name"); if(pn) pn.textContent=$("name").value.trim()||"이 분"; });
   function shareLine(){
     const name = $("name").value.trim().replace(/[·\[\]]/g,"") || "익명";
     const parts = ["[집중력] "+name];
